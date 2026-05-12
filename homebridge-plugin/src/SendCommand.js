@@ -18,6 +18,37 @@ let _log = null;
 // Serialises writes so concurrent group commands don't contend for the port lock
 let _writeQueue = Promise.resolve();
 
+// RF transmission takes ~650ms; 5s gives generous headroom before timing out
+const RESPONSE_TIMEOUT_MS = 5000;
+
+function readResponse(port) {
+    return new Promise((resolve, reject) => {
+        let buffer = '';
+
+        const cleanup = (fn) => {
+            port.removeListener('data', onData);
+            clearTimeout(timer);
+            fn();
+        };
+
+        const onData = (data) => {
+            buffer += data.toString();
+            if (buffer.includes('OK')) {
+                cleanup(resolve);
+            } else if (buffer.includes('ERR')) {
+                cleanup(() => reject(new Error('Pico returned ERR')));
+            }
+        };
+
+        const timer = setTimeout(
+            () => cleanup(() => reject(new Error('Timed out waiting for Pico response'))),
+            RESPONSE_TIMEOUT_MS
+        );
+
+        port.on('data', onData);
+    });
+}
+
 /**
  * Finds the serial port path of the connected Pico by matching the manufacturer string.
  *
@@ -70,7 +101,11 @@ export async function sendCommand(api, config, button, log) {
     const queued = _writeQueue.then(async () => {
         try {
             const port = await getPort();
-            port.write(`${config.id},${BUTTON[button]},${rollingCode},${repetitions}\r\n`);
+            await new Promise((resolve, reject) => {
+                port.write(`${config.id},${BUTTON[button]},${rollingCode},${repetitions}\r\n`,
+                    err => err ? reject(err) : resolve());
+            });
+            await readResponse(port);
             BlindState.advanceRollingCode(api, config.id);
         } catch (err) {
             log.error(`Failed to send command to Pico: ${err.message}`);

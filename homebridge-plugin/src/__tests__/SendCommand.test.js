@@ -54,4 +54,23 @@ describe("Testing Send Command class", () => {
         expect(state).toEqual(1);
         expect(log.error).toHaveBeenCalled();
     });
+
+    test("rolling code does not advance when Pico returns ERR", async () => {
+        const config = {
+            "id": 99130,
+            "name": "test"
+        };
+
+        jest.spyOn(SerialPort.prototype, 'write').mockImplementationOnce(function(data, callback) {
+            if (callback) callback(null);
+            process.nextTick(() => this.emit('data', Buffer.from('ERR\n')));
+        });
+
+        const log = { error: jest.fn() };
+        await sendCommand(api, config, 'Up', log);
+
+        const state = BlindState.getRollingCode(api, config.id);
+        expect(state).toEqual(1);
+        expect(log.error).toHaveBeenCalledWith(expect.stringContaining('ERR'));
+    });
 });
