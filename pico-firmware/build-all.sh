@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SDK_PATH="$SCRIPT_DIR/pico-sdk"
+BUILD_DIR="$SCRIPT_DIR/build"
 DIST_DIR="$SCRIPT_DIR/dist"
 BOARDS=(pico pico_w pico2 pico2_w)
 
@@ -12,21 +13,27 @@ if [ ! -f "$SDK_PATH/CMakeLists.txt" ]; then
     exit 1
 fi
 
-mkdir -p "$DIST_DIR"
+mkdir -p "$BUILD_DIR"
 
 for BOARD in "${BOARDS[@]}"; do
     echo "==> Building for $BOARD..."
-    BUILD_DIR="$SCRIPT_DIR/build/$BOARD"
-    mkdir -p "$BUILD_DIR"
-    cmake -S "$SCRIPT_DIR" -B "$BUILD_DIR" \
+    BOARD_BUILD_DIR="$BUILD_DIR/$BOARD"
+    mkdir -p "$BOARD_BUILD_DIR"
+    cmake -S "$SCRIPT_DIR" -B "$BOARD_BUILD_DIR" \
         -DPICO_BOARD="$BOARD" \
         -DPICO_SDK_PATH="$SDK_PATH" \
         -DCMAKE_BUILD_TYPE=Release \
         --log-level=WARNING \
         -Wno-dev
-    cmake --build "$BUILD_DIR" --parallel
-    cp "$BUILD_DIR/RpiGpioRts_Pico.uf2" "$DIST_DIR/RpiGpioRts_Pico-${BOARD}.uf2"
-    echo "    -> dist/RpiGpioRts_Pico-${BOARD}.uf2"
+    cmake --build "$BOARD_BUILD_DIR" --parallel
+done
+
+echo "==> Collecting UF2 files..."
+mkdir -p "$DIST_DIR"
+for BOARD in "${BOARDS[@]}"; do
+    UF2=$(find "$BUILD_DIR/$BOARD" -maxdepth 1 -name "*.uf2" | head -1)
+    cp "$UF2" "$DIST_DIR/firmware_${BOARD}.uf2"
+    echo "    -> dist/firmware_${BOARD}.uf2"
 done
 
 echo ""

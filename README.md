@@ -33,7 +33,7 @@ Connect the transmitter to the Raspberry Pi Pico:
 - Transmitter ATAD (DATA) to Raspberry Pi GPIO 4 (Pin 6)
 
 ### Installing the firmware onto the Pico
-There is a Boot Selection button on the Raspberry Pi Pico that allows you to flash the firmware of the device. Hold this button whilst you plug it into a USB port. You should see that the device is automatically mounted as a USB drive. Once mounted copy the [UF2 file](pico-firmware/build) corresponding to the version of your Pico device. After the transfer completes, the device resets automatically and should be running in application mode (mounted under `/etc/` but no longer visible as a drive).
+There is a Boot Selection button on the Raspberry Pi Pico that allows you to flash the firmware of the device. Hold this button whilst you plug it into a USB port. You should see that the device is automatically mounted as a USB drive. Once mounted copy the [UF2 file from the dist folder](./pico-firmware/dist) corresponding to the version of your Pico device. After the transfer completes, the device resets automatically and should be running in application mode (mounted under `/etc/` but no longer visible as a drive).
 
 ### Installing the Homebridge Plugin
 This plugin works with a standard Homebridge install. Simply install `homebridge-somfy-pico` from the **Plugins** menu and make sure the Pico is connected via USB to the server.
