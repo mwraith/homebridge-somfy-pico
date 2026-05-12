@@ -15,6 +15,9 @@ let _port = null;
 // Cached logger — set on first sendCommand call, used by the port error handler
 let _log = null;
 
+// Serialises writes so concurrent group commands don't contend for the port lock
+let _writeQueue = Promise.resolve();
+
 /**
  * Finds the serial port path of the connected Pico by matching the manufacturer string.
  *
@@ -64,12 +67,17 @@ export async function sendCommand(api, config, button, log) {
     const rollingCode = BlindState.getRollingCode(api, config.id);
     const repetitions = config.repetitions || 4;
 
-    try {
-        const port = await getPort();
-        port.write(`${config.id},${BUTTON[button]},${rollingCode},${repetitions}\r\n`);
-        BlindState.advanceRollingCode(api, config.id);
-    } catch (err) {
-        log.error(`Failed to send command to Pico: ${err.message}`);
-    }
+    const queued = _writeQueue.then(async () => {
+        try {
+            const port = await getPort();
+            port.write(`${config.id},${BUTTON[button]},${rollingCode},${repetitions}\r\n`);
+            BlindState.advanceRollingCode(api, config.id);
+        } catch (err) {
+            log.error(`Failed to send command to Pico: ${err.message}`);
+        }
+    });
+
+    _writeQueue = queued;
+    await queued;
 }
 commands.sendCommand = sendCommand;
