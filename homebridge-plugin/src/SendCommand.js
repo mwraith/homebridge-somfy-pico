@@ -67,10 +67,9 @@ export async function sendCommand(api, config, button, log) {
     try {
         const port = await getPort();
         port.write(`${config.id},${BUTTON[button]},${rollingCode},${repetitions}\r\n`);
+        BlindState.advanceRollingCode(api, config.id);
     } catch (err) {
         log.error(`Failed to send command to Pico: ${err.message}`);
     }
-
-    BlindState.advanceRollingCode(api, config.id);
 }
 commands.sendCommand = sendCommand;
