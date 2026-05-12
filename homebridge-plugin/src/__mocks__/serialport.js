@@ -6,6 +6,6 @@ export class SerialPort {
     write(data) {}
     on(event, fn) {}
     static list() {
-        return Promise.resolve([{ path: '/dev/ttyACM0', manufacturer: 'homebridge-somfy-pico' }]);
+        return Promise.resolve([{ path: '/dev/ttyACM0', manufacturer: 'homebridge-somfy-pi' }]);
     }
 }

@@ -23,7 +23,7 @@ let _log = null;
  */
 async function findPicoPath() {
     const ports = await SerialPort.list();
-    const pico = ports.find(p => p.manufacturer === 'homebridge-somfy-pico');
+    const pico = ports.find(p => p.manufacturer === 'homebridge-somfy-pi');
     if (!pico) throw new Error('Somfy Pico not found — is it plugged in?');
     return pico.path;
 }

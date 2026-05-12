@@ -1,6 +1,6 @@
 {
   "name": "homebridge-somfy-pico",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.3",
   "description": "A Homebridge plugin to control any device with the Somfy RTS technology with a Raspberry Pi Pico connected to a simple 433 MHz transmitter. Optimised for Homebridge v2",
   "keywords": [
     "somfy",

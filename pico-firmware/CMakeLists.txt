@@ -16,7 +16,7 @@ pico_enable_stdio_uart(RpiGpioRts_Pico 1)
 pico_add_extra_outputs(RpiGpioRts_Pico)
 
 target_compile_definitions(RpiGpioRts_Pico PRIVATE
-    USBD_MANUFACTURER="homebridge-somfy-pico"
+    USBD_MANUFACTURER="homebridge-somfy-pi"
 )
 
 target_link_libraries(RpiGpioRts_Pico pico_stdlib hardware_gpio)
