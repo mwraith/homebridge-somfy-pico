@@ -54,6 +54,9 @@ export default class SomfyRtsPlatform {
                 this.api.registerPlatformAccessories('homebridge-somfy-pico', 'Somfy Blinds', [accessory]);
             } else {
                 this.log.info(`Updating existing device: ${device.name}`);
+                accessory.services
+                    .filter(s => s.UUID !== this.api.hap.Service.AccessoryInformation.UUID)
+                    .forEach(s => accessory.removeService(s));
             }
 
             const somfyAccessory = new SomfyRtsRemoteAccessory(this.log, device, this.api);
