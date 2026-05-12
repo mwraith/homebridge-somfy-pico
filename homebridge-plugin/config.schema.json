@@ -1,0 +1,87 @@
+{
+    "pluginAlias": "Somfy Blinds",
+    "pluginType": "platform",
+    "singular": true,
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Name",
+                "type": "string",
+                "default": "Somfy Blinds",
+                "required": true
+            },
+            "devices": {
+                "title": "Devices",
+                "type": "array",
+                "required": true,
+                "items": {
+                    "title": "Device",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "type": "string",
+                            "required": true,
+                            "description": "Display name for the blind in HomeKit"
+                        },
+                        "id": {
+                            "title": "Device ID",
+                            "type": "integer",
+                            "required": true,
+                            "description": "Unique numeric identifier for this Somfy RTS remote"
+                        },
+                        "blindTimeToOpen": {
+                            "title": "Time to Open (ms)",
+                            "type": "integer",
+                            "default": 10000,
+                            "description": "How long the blind takes to fully open or close, in milliseconds"
+                        },
+                        "repetitions": {
+                            "title": "Command Repetitions",
+                            "type": "integer",
+                            "default": 4,
+                            "description": "Number of times each RTS command is transmitted"
+                        },
+                        "invertToggle": {
+                            "title": "Invert Toggle",
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Swap the Up and Down commands (useful if the blind is mounted inverted)"
+                        },
+                        "openToMyPosition": {
+                            "title": "Open to My Position",
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Send My instead of Up when opening — use for venetian blinds where My sets a partial tilt"
+                        },
+                        "adminMode": {
+                            "title": "Admin Mode",
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Expose individual Up, Down, My and Prog button switches alongside the blind"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "layout": [
+        "name",
+        {
+            "key": "devices",
+            "type": "array",
+            "title": "Devices",
+            "buttonText": "Add Device",
+            "items": [
+                "devices[].name",
+                "devices[].id",
+                "devices[].blindTimeToOpen",
+                "devices[].repetitions",
+                "devices[].invertToggle",
+                "devices[].openToMyPosition",
+                "devices[].adminMode"
+            ]
+        }
+    ]
+}

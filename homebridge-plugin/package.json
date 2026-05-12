@@ -1,0 +1,42 @@
+{
+  "name": "homebridge-somfy-pico",
+  "version": "0.1.0",
+  "description": "A Homebridge plugin to control any device with the Somfy RTS technology with a Raspberry Pi Pico connected to a simple 433 MHz transmitter. Optimised for Homebridge v2",
+  "keywords": [
+    "somfy",
+    "blinds",
+    "homebridge",
+    "homebridge-plugin",
+    "pico",
+    "rts",
+    "homekit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mwraith/homebridge-somfy-pico.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mwraith/homebridge-somfy-pico/issues"
+  },
+  "license": "MIT",
+  "author": "Mark Wraith",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": {
+    "homebridge": ">=2.0.0",
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+  },
+  "peerDependencies": {
+    "homebridge": ">=2.0.0"
+  },
+  "devDependencies": {
+    "homebridge": "^2.0.0",
+    "jest": "^30.4.0"
+  },
+  "dependencies": {
+    "serialport": "^13.0.0"
+  }
+}

@@ -1,0 +1,34 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install ARM toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi cmake ninja-build
+
+      - name: Build UF2 files
+        run: |
+          cd pico-firmware
+          ./build-all.sh
+
+      - name: Create release and upload UF2 files
+        uses: softprops/action-gh-release@v2
+        with:
+          files: pico-firmware/dist/*.uf2
+          fail_on_unmatched_files: true
