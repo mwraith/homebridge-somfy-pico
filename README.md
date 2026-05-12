@@ -61,7 +61,7 @@ When a device receives a signal it does the following:
 A same remote can even be registered on many devices (intentionally or inadvertently), and thus control simultaneoulsy many devices.
 
 
-### Platform Configuration (recommended as it supports Child Bridge)
+### Platform Configuration
 Go to **Homebridge Config UI**, open the **Plugins** tab, and click **Plugin Config** under *Homebridge Somfy Pico*.  
 
 Add your blinds under the **Devices** list. Each device entry is equivalent to a virtual Somfy RTS remote. Each device must have a unique `id`.
