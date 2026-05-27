@@ -11,6 +11,11 @@
                 "default": "Somfy Blinds",
                 "required": true
             },
+            "host": {
+                "title": "Pico Hostname / IP (WiFi mode)",
+                "type": "string",
+                "description": "Hostname or IP of the Pico when using the WiFi firmware (e.g. somfy-pico.local). Leave blank for USB serial mode (default)."
+            },
             "devices": {
                 "title": "Devices",
                 "type": "array",
@@ -68,6 +73,7 @@
     },
     "layout": [
         "name",
+        "host",
         {
             "key": "devices",
             "type": "array",

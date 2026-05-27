@@ -3,17 +3,11 @@
 #include <stdint.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
+#include "rts_command.h"
 
-// The Raspberry Pi Pico's GPIO pin number linked to the 'data' pin of the RF emitter
-#define OUT_PIN 4
-
-// Button codes — must match the BUTTON enum in the homebridge plugin's SendCommand.js
-typedef enum {
-    MY   = 0x1,
-    UP   = 0x2,
-    DOWN = 0x4,
-    PROG = 0x8
-} Button;
+#ifdef WIFI_TRANSPORT
+#include "wifi_transport.h"
+#endif
 
 // Structure for waveform pulses
 typedef struct {
@@ -23,12 +17,15 @@ typedef struct {
 } Pulse;
 
 // Function prototypes
-void sendCommand(uint32_t id, Button button, uint16_t rollingCode, int repetitions);
 uint8_t* getPayloadData(uint32_t id, Button button, uint16_t rollingCode);
 Pulse* getWaveform(uint8_t* payloadData, int repetitions, int* waveformSize);
 
 #ifndef UNIT_TEST
 int main() {
+#ifdef WIFI_TRANSPORT
+    wifi_transport_run();  // never returns
+    return 0;
+#else
     stdio_init_all();
     sleep_ms(2000);
 
@@ -58,6 +55,7 @@ int main() {
     }
 
     return 0;
+#endif
 }
 #endif /* UNIT_TEST */
 

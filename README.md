@@ -14,7 +14,8 @@ The previous version used a Raspberry Pi 4 with a transmitter connected to the G
 Somfy RTS uses a frequency of 433.42 MHz instead of the usual 433.92 MHz, which requires you to replace the resonator on the standard transmitter.
 
 ### Parts
-- Raspberry Pi Pico with header and USB cable (any version should work)
+- Raspberry Pi Pico (any version). Use a **Pico W** or **Pico 2W** if you want WiFi mode (see below).
+- USB cable
 - 433 MHz RF transmitter ([example](https://i.pinimg.com/474x/cb/47/a8/cb47a81619e16eb344d89ee03a382dc1.jpg))
 - 433.42 MHz saw resonator ([example](https://www.ebay.com/sch/i.html?_nkw=433.42+resonator))
 - antenna (my transmitter cam with one, but any wire should work)
@@ -33,10 +34,51 @@ Connect the transmitter to the Raspberry Pi Pico:
 - Transmitter ATAD (DATA) to Raspberry Pi GPIO 4 (Pin 6)
 
 ### Installing the firmware onto the Pico
-There is a Boot Selection button on the Raspberry Pi Pico that allows you to flash the firmware of the device. Hold this button whilst you plug it into a USB port. You should see that the device is automatically mounted as a USB drive. Once mounted copy the [UF2 file from the dist folder](./pico-firmware/dist) corresponding to the version of your Pico device. After the transfer completes, the device resets automatically and should be running in application mode (mounted under `/etc/` but no longer visible as a drive).
+There is a Boot Selection button on the Raspberry Pi Pico that allows you to flash the firmware of the device. Hold this button whilst you plug it into a USB port. You should see that the device is automatically mounted as a USB drive. Once mounted copy the [UF2 file from the dist folder](./pico-firmware/dist) corresponding to your Pico model:
+
+| File | Board |
+|------|-------|
+| `firmware_pico.uf2` | Raspberry Pi Pico |
+| `firmware_pico2.uf2` | Raspberry Pi Pico 2 |
+| `firmware_pico_w.uf2` | Raspberry Pi Pico W |
+| `firmware_pico2_w.uf2` | Raspberry Pi Pico 2W |
+
+After the transfer completes, the device resets automatically and should be running in application mode (mounted under `/etc/` but no longer visible as a drive).
+
+The **Pico W / Pico 2W firmware** supports both USB serial and WiFi. It starts in serial mode and gains WiFi capability once you configure it (see [WiFi Mode](#wifi-mode) below).
 
 ### Installing the Homebridge Plugin
 This plugin works with a standard Homebridge install. Simply install `homebridge-somfy-pico` from the **Plugins** menu and make sure the Pico is connected via USB to the server.
+
+### WiFi Mode
+> Requires a Pico W or Pico 2W with the corresponding firmware.
+
+WiFi mode lets the Pico join your home network so it doesn't need to be physically connected to the Homebridge server. USB serial continues to work alongside WiFi — you don't have to choose.
+
+**First-time WiFi setup:**
+
+1. Power on the Pico W (USB to any power source, no PC required)
+2. It will broadcast a WiFi network called **`somfy-pico-setup`**
+3. Connect your phone or laptop to that network
+4. Open **http://192.168.4.1** in a browser
+5. Enter your home WiFi SSID and password, then click *Save & Connect*
+6. The Pico reboots, joins your network, and becomes reachable as **`somfy-pico.local`**
+
+If the WiFi connection fails at boot (e.g. wrong password, router temporarily down), the Pico falls back to serial-only mode and keeps the stored credentials — it will retry on the next reboot. To re-run setup, reflash the firmware (which clears the flash) and repeat the steps above.
+
+**Homebridge config for WiFi mode:**
+
+Add a `host` field at the platform level pointing to the Pico's hostname or IP:
+
+```json
+{
+    "name": "Somfy Blinds Pico",
+    "host": "somfy-pico.local",
+    "devices": [...]
+}
+```
+
+Leave `host` out entirely to use USB serial (the default).
 
 ## Configuration
 
@@ -88,9 +130,13 @@ Alternatively, edit your `config.json` and add the following block inside the **
 
 
 ### Configuration Options
-Configuration settings below are supported for both platform and accessory modes:
-- `name` is the name of the accessory as it will appear in HomeKit (required)
-- `id` is the unique ID of the virtual Somfy RTS remote to choose between 0 and 16777216 (required)
+**Platform options:**
+- `name` is the platform name (required)
+- `host` is the hostname or IP of the Pico when using WiFi mode (e.g. `somfy-pico.local`). Omit for USB serial mode (default).
+
+**Per-device options:**
+- `name` is the name of the blind as it will appear in HomeKit (required)
+- `id` is the unique ID of the virtual Somfy RTS remote, choose between 0 and 16777216 (required)
 - `adminMode` is used for programming the blind. When set to true Homebridge will shows four stateless buttons (Up, Down, My, Prog) and when false it shows only a single stateful device
 - `invertToggle` is used for blinds that extend upwards where the Up command actually closes the blind
 - `repetitions` is an optional parameter that states how many times the signal should be sent. Sending multiple times may improve reception, however if the number is too large some blinds may detect it as a long button press, which only moves the blinds one step (Default = 4)

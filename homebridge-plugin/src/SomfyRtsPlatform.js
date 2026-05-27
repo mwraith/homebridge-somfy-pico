@@ -1,4 +1,5 @@
 import SomfyRtsRemoteAccessory from './SomfyRtsRemoteAccessory.js';
+import SendCommand from './SendCommand.js';
 
 export default class SomfyRtsPlatform {
 
@@ -19,6 +20,11 @@ export default class SomfyRtsPlatform {
         if (!config || !config.devices) {
             this.log.warn('No devices configured. Please update your Homebridge config.');
             return;
+        }
+
+        if (config.host) {
+            SendCommand.configure({ host: config.host });
+            this.log.info(`WiFi mode: connecting to Pico at ${config.host}:8765`);
         }
 
         this.api.on('didFinishLaunching', () => {
