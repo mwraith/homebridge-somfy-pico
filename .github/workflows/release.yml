@@ -32,3 +32,26 @@ jobs:
         with:
           files: pico-firmware/dist/*.uf2
           fail_on_unmatched_files: true
+
+  publish-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: homebridge-plugin
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        working-directory: homebridge-plugin
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
